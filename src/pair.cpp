@@ -44,21 +44,18 @@ double dist_chisquare(colvec& col_i, colvec& col_j) {
 }
 
 double dist_kullback(colvec& col_i, colvec& col_j) {
+    uvec zeroi = find(col_i == 0);
+    if (zeroi.n_rows > 0)
+        return NAN;
+    uvec zeroj = find(col_j == 0);
+    if (zeroj.n_rows > 0)
+        return NAN;
 
-    uvec nz = intersect(find(col_i != 0), find(col_j != 0));
-    if (nz.n_rows == 0)
-        return 0;
-    double s1 = accu(col_i(nz));
-    double s2 = accu(col_j(nz));
-    colvec p1 = col_i(nz) / s1;
-    colvec p2 = col_j(nz) / s2;
+    double s1 = accu(col_i);
+    double s2 = accu(col_j);
+    colvec p1 = col_i / s1;
+    colvec p2 = col_j / s2;
 
-    //Rcout << "log(p1):\n" << log(trans(p1)) << "\n";
-    //Rcout << "log(p2):\n" << log(trans(p2)) << "\n";
-    //Rcout << "trans(p1) * log(p1):\n" << trans(p1) * log(p1);
-    //Rcout << "trans(p1) * log(p2):\n" << trans(p1) * log(p2);
-    //Rcout << "simil\n" << as_scalar((trans(p1) * log(p1)) - (trans(p1) * log(p2))) << "\n";
-    //return as_scalar((trans(p1) * log(p1)) - (trans(p1) * log(p2)));
     return as_scalar(trans(p2) * log(p2 / p1));
 }
 
@@ -157,7 +154,7 @@ struct proxy_pair : public Worker {
             }
             double l = get_limit(simils, rank, limit);
             for (std::size_t k = 0; k < simils.size(); k++) {
-                if (simils[k] >= l) {
+                if (simils[k] >= l || std::isnan(simils[k])) {
                     simil_tri.push_back(std::make_tuple(k, i, simils[k]));
                 }
             }
