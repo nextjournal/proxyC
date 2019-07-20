@@ -45,11 +45,11 @@ double dist_chisquare(colvec& col_i, colvec& col_j) {
 
 double dist_kullback(colvec& col_i, colvec& col_j) {
 
-    double s1 = accu(col_i);
-    double s2 = accu(col_j);
     uvec nz = intersect(find(col_i != 0), find(col_j != 0));
     if (nz.n_rows == 0)
         return 0;
+    double s1 = accu(col_i(nz));
+    double s2 = accu(col_j(nz));
     colvec p1 = col_i(nz) / s1;
     colvec p2 = col_j(nz) / s2;
 
