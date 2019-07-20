@@ -51,7 +51,7 @@ test_that("test kullback kullback distance", {
     skip_if_not_installed("proxy")
     mat_abs <- abs(Matrix::rsparsematrix(20, 100, 0.5))
     dists <- dist(mat_abs, margin = 2, method = "kullback")
-    expect_false(any(dists < 0))
+    expect_true(all(dists >= 0 | is.nan(as.vector(dists))))
 
     # manual_dist_comp <- sapply(seq_len(ncol(mat_abs)), function(Qi) {
     #     Q <- mat_abs[,Qi]
@@ -69,7 +69,7 @@ test_that("test kullback kullback distance", {
     # expect_equal(as.numeric(dists), as.numeric(manual_dist_comp), tolerance = .001)
 
     dists <- dist(mat_abs, margin = 1, method = "kullback")
-    expect_false(any(dists < 0))
+    expect_true(all(dists >= 0 | is.nan(as.vector(dists))))
 
     # manual_dist_comp <- sapply(seq_len(nrow(mat_abs)), function(Qi) {
     #     Q <- mat_abs[Qi,]
