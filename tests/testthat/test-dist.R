@@ -47,14 +47,45 @@ test_that("test dist euclidean distance", {
     test_dist(mat_test, "euclidean", margin = 2)
 })
 
-# test_that("test kullback kullback distance", {
-#     skip_if_not_installed("proxy")
-#     # make dense matrix to avoide Inf in proxy::dist
-#     mat_test_dense <- mat_test + 1
-#     # proxy::dist() also incorrectly produces symmetric matrix
-#     test_dist(mat_test_dense, "kullback", margin = 1, ignore_upper = TRUE)
-#     test_dist(mat_test_dense, "kullback", margin = 2, ignore_upper = TRUE)
-# })
+test_that("test kullback kullback distance", {
+    skip_if_not_installed("proxy")
+    mat_abs <- abs(Matrix::rsparsematrix(20, 100, 0.5))
+    dists <- dist(mat_abs, margin = 2, method = "kullback")
+    expect_false(any(dists < 0))
+
+    # manual_dist_comp <- sapply(seq_len(ncol(mat_abs)), function(Qi) {
+    #     Q <- mat_abs[,Qi]
+    #     sapply(seq_len(ncol(mat_abs)), function(Pi) {
+    #         P <- mat_abs[,Pi]
+    #         ix <- P != 0 & Q != 0
+    #         P <- P[ix]
+    #         Q <- Q[ix]
+    #         P <- P / sum(P) # only calculate sum on P[ix]
+    #         Q <- Q / sum(Q) # only calculate sum on Q[ix]
+    #         sum(P * log(P / Q))
+    #     })
+    # })
+    #
+    # expect_equal(as.numeric(dists), as.numeric(manual_dist_comp), tolerance = .001)
+
+    dists <- dist(mat_abs, margin = 1, method = "kullback")
+    expect_false(any(dists < 0))
+
+    # manual_dist_comp <- sapply(seq_len(nrow(mat_abs)), function(Qi) {
+    #     Q <- mat_abs[Qi,]
+    #     sapply(seq_len(nrow(mat_abs)), function(Pi) {
+    #         P <- mat_abs[Pi,]
+    #         ix <- P != 0 & Q != 0
+    #         P <- P[ix]
+    #         Q <- Q[ix]
+    #         P <- P / sum(P) # only calculate sum on P[ix]
+    #         Q <- Q / sum(Q) # only calculate sum on Q[ix]
+    #         sum(P * log(P / Q))
+    #     })
+    # })
+    #
+    # expect_equal(as.numeric(dists), as.numeric(manual_dist_comp), tolerance = .001)
+})
 
 test_that("test dist manhattan distance", {
     skip_if_not_installed("proxy")
